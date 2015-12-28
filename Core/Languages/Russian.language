@@ -1,0 +1,23 @@
+# General Variables
+Head_Opensearch_Meta = Поиск по
+Head_News_Meta = Новости
+Language_Change = Сменить
+Language_Locale = Язык
+Language_Region = Регион
+
+# Website Top Menu
+Menu_Main = Главная
+Menu_Game = Игра
+Menu_Community = Сообщество
+Menu_Media = Материалы
+Menu_Forums = Форумы
+Menu_Shop = Магазин
+
+
+# Footer Localization
+Footer_ToS = Пользовательское соглашение
+Footer_Legal = Соглашения
+Footer_PP = Политика конфиденциальности
+Footer_Copyright = Авторское право
+Footer_Contacts = Контакты
+Footer_Rights = Все права защищены
