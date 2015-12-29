@@ -3,12 +3,30 @@ namespace Core\Extensions;
 use Core\Libraries\FreedomCore\System\Database as Database;
 use Core\Libraries\FreedomCore\System\Text as Text;
 use Core\Libraries\FreedomCore\System\File as File;
+use \PDO as PDO;
 
 class Installer {
 
+    /**
+     * Smarty Template Manager Variable
+     * @var
+     */
     private $TM;
 
     /**
+     * Reference to DatabaseManager Class
+     * @var
+     */
+    private $DBManager;
+
+    /**
+     * Website Connection PDO Object
+     * @var
+     */
+    private $Connection = null;
+
+    /**
+     * Installer Class Constructor
      * @param null $TemplatesManager
      */
     public function _construct($TemplatesManager = null){
@@ -112,28 +130,138 @@ class Installer {
         $InstallationFolder = $ServerFolder.DS.'Install';
         $ConfigurationFolder = $InstallationFolder.DS.'configuration';
         $Configurations = [];
-        foreach(glob($ConfigurationFolder.'/*.*') as $file)
+        foreach(glob($ConfigurationFolder.'/*.json') as $file)
             $Configurations[] = json_decode(file_get_contents($file), true);
 
         return json_encode($Configurations, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     /**
-     * Match Patch ID With Its Name
-     * @param $PatchID
-     * @return mixed
+     * Check if all required modules installed
+     * @return array
      */
-    private function getPatchMatch($PatchID){
-        $Patches = [
-            1   =>  ['short' => 'classic', 'full' => 'Classic', 'real' => '0', 'dbname' => 'Classic'],
-            2   =>  ['short' => 'tbc', 'full' => 'The Burning Crusade', 'real' => '1', 'dbname' => 'TBC'],
-            3   =>  ['short' => 'wotlk', 'full' => 'Wrath of the Lich King', 'real' => '2', 'dbname' => 'WotLK'],
-            4   =>  ['short' => 'cataclysm', 'full' => 'Cataclysm', 'real' => '3', 'dbname' => 'Cata'],
-            5   =>  ['short' => 'mop', 'full' => 'Mists of Pandaria', 'real' => '4', 'dbname' => 'MOP'],
-            6   =>  ['short' => 'draenor', 'full' => 'Warlords of Draenor', 'real' => '5', 'dbname' => 'WoD'],
-            7   =>  ['short' => 'legion', 'full' => 'Legion', 'real' => '6', 'dbname' => 'Legion']
-        ];
-        return $Patches[$PatchID];
+    public function checkPHPModules()
+    {
+        $ModulesArray = array(
+            array(
+                'name' => 'pdo_mysql',
+                'status' => extension_loaded('pdo_mysql')
+            ),
+            array(
+                'name' => 'curl',
+                'status' => extension_loaded('curl')
+            ),
+            array(
+                'name' => 'mysqli',
+                'status' => extension_loaded('mysqli')
+            ),
+            array(
+                'name' => 'soap',
+                'status' => extension_loaded('soap')
+            ),
+            array(
+                'name' => 'gd',
+                'status' => extension_loaded('gd')
+            ),
+            array(
+                'name' => 'soap',
+                'status' => extension_loaded('soap')
+            ),
+        );
+
+        return $ModulesArray;
+    }
+
+    /**
+     * Get Server Info
+     * @return array
+     */
+    public function getServerInfo()
+    {
+        $ServerData = [];
+        $ServerData['Server'] = $_SERVER["SERVER_SOFTWARE"];
+        $ServerData['PHP'] = $this->getPHPInfo();
+        $ServerData['MySQL'] = $this->getMySQLInfo();
+        if(strstr($_SERVER['SERVER_SOFTWARE'], 'Apache')){
+            $ServerData['Apache'] = $this->getApacheInfo();
+            $ServerData['TestState'] = "VALIDATION_STATE_TESTED";
+        } else
+            $ServerData['TestState'] = "VALIDATION_STATE_UNTESTED";
+        $ServerData['OS'] = $this->getOSInfo();
+
+
+        if( $ServerData['PHP']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['PHP']['valid'] == 'VALIDATION_STATE_WARNING' &&
+            $ServerData['MySQL']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['MySQL']['valid'] == 'VALIDATION_STATE_WARNING' &&
+            $ServerData['OS']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['OS']['valid'] == 'VALIDATION_STATE_WARNING' )
+            $ServerData['AllowInstallation'] = "YES";
+        else
+            $ServerData['AllowInstallation'] = "NO";
+        return $ServerData;
+    }
+
+    /**
+     * Process Received Data From Parsing JSON and $_REQUEST Variable
+     * @param $Databases
+     * @param $SiteData
+     */
+    public function processInput($Databases, $SiteData){
+        $Configuration = '<?php'.PHP_EOL;
+        $Configuration .= 'global $FCCore;'.PHP_EOL.PHP_EOL;
+        $WebsiteConfiguration = "";
+        $PatchesConfiguration = [];
+        $SocialConfiguration = [];
+        $AnalyticsConfiguration = [];
+        $SiteConfiguration = [];
+        foreach($Databases as $Database)
+            if(count($Database) == 6)
+                $WebsiteConfiguration = $this->processWebsiteDatabase($Database);
+            else {
+                $Parsed = $this->processGameDatabase($Database, $PatchesConfiguration);
+                $PatchesConfiguration[$Parsed['Key']] = $Parsed['Config'];
+            }
+
+        $Configuration .= $WebsiteConfiguration;
+        foreach($PatchesConfiguration as $PatchDB)
+            $Configuration .= $PatchDB;
+
+        foreach($SiteData as $Key=>$Value){
+            if(strstr($Key, '_link') || strstr($Key, 'skype'))
+                $SocialConfiguration[] = $this->processSocialData($Key, $Value, $SocialConfiguration);
+            if(strstr($Key, 'ga_'))
+                $AnalyticsConfiguration[] = $this->processAnalyticsData($Key, $Value, $AnalyticsConfiguration);
+            if(strstr($Key, 'site_'))
+                $SiteConfiguration[] = $this->processSiteData($Key, $Value);
+        }
+
+        foreach($SocialConfiguration as $Social)
+            $Configuration .= $Social;
+        foreach($AnalyticsConfiguration as $Analytics)
+            $Configuration .= $Analytics;
+
+        $Configuration .= PHP_EOL.'// Facebook Settings'.PHP_EOL;
+        foreach($this->processFABlock() as $IKey => $IVal)
+            $Configuration .= '$FCCore[\'Facebook\'][\''.$IKey.'\'] = \''.$IVal.'\';'.PHP_EOL;
+
+        $Configuration .= PHP_EOL.'// Site Configuration'.PHP_EOL;
+        foreach($SiteConfiguration as $Item)
+            $Configuration .= $Item;
+        foreach($this->processBasicConfiguration() as $IKey => $IVal){
+            if($IVal === false)
+                $Configuration .= '$FCCore[\''.$IKey.'\'] = false;'.PHP_EOL;
+            elseif($IVal === true)
+                $Configuration .= '$FCCore[\''.$IKey.'\'] = true;'.PHP_EOL;
+            else
+                $Configuration .= '$FCCore[\''.$IKey.'\'] = \''.$IVal.'\';'.PHP_EOL;
+        }
+
+        $Configuration .= PHP_EOL."?>";
+        $ConfigurationFile = getcwd().DS.'Core'.DS.'Configuration'.DS.'Configuration.php';
+        if(File::Exists($ConfigurationFile)){
+            unlink($ConfigurationFile);
+            file_put_contents($ConfigurationFile, $Configuration);
+        } else {
+            file_put_contents($ConfigurationFile, $Configuration);
+        }
     }
 
     /**
@@ -177,6 +305,32 @@ class Installer {
         }
 
         return $this->getGithubFileData($InstallationFolder);
+    }
+
+    /**
+     * Set Database Manager
+     * @param DatabaseManager $DBManager
+     */
+    public function assignDBManager(DatabaseManager $DBManager){
+        $this->DBManager = $DBManager;
+    }
+
+    /**
+     * Match Patch ID With Its Name
+     * @param $PatchID
+     * @return mixed
+     */
+    private function getPatchMatch($PatchID){
+        $Patches = [
+            1   =>  ['short' => 'classic', 'full' => 'Classic', 'real' => '0', 'dbname' => 'Classic'],
+            2   =>  ['short' => 'tbc', 'full' => 'The Burning Crusade', 'real' => '1', 'dbname' => 'TBC'],
+            3   =>  ['short' => 'wotlk', 'full' => 'Wrath of the Lich King', 'real' => '2', 'dbname' => 'WotLK'],
+            4   =>  ['short' => 'cataclysm', 'full' => 'Cataclysm', 'real' => '3', 'dbname' => 'Cata'],
+            5   =>  ['short' => 'mop', 'full' => 'Mists of Pandaria', 'real' => '4', 'dbname' => 'MOP'],
+            6   =>  ['short' => 'draenor', 'full' => 'Warlords of Draenor', 'real' => '5', 'dbname' => 'WoD'],
+            7   =>  ['short' => 'legion', 'full' => 'Legion', 'real' => '6', 'dbname' => 'Legion']
+        ];
+        return $Patches[$PatchID];
     }
 
     /**
@@ -248,69 +402,6 @@ class Installer {
         }
 
         return $FreedomCoreRepo;
-    }
-
-    /**
-     * Check if all required modules installed
-     * @return array
-     */
-    public function checkPHPModules()
-    {
-        $ModulesArray = array(
-            array(
-                'name' => 'pdo_mysql',
-                'status' => extension_loaded('pdo_mysql')
-            ),
-            array(
-                'name' => 'curl',
-                'status' => extension_loaded('curl')
-            ),
-            array(
-                'name' => 'mysqli',
-                'status' => extension_loaded('mysqli')
-            ),
-            array(
-                'name' => 'soap',
-                'status' => extension_loaded('soap')
-            ),
-            array(
-                'name' => 'gd',
-                'status' => extension_loaded('gd')
-            ),
-            array(
-                'name' => 'soap',
-                'status' => extension_loaded('soap')
-            ),
-        );
-
-        return $ModulesArray;
-    }
-
-    /**
-     * Get Server Info
-     * @return array
-     */
-    public function getServerInfo()
-    {
-        $ServerData = [];
-        $ServerData['Server'] = $_SERVER["SERVER_SOFTWARE"];
-        $ServerData['PHP'] = $this->getPHPInfo();
-        $ServerData['MySQL'] = $this->getMySQLInfo();
-        if(strstr($_SERVER['SERVER_SOFTWARE'], 'Apache')){
-            $ServerData['Apache'] = $this->getApacheInfo();
-            $ServerData['TestState'] = "VALIDATION_STATE_TESTED";
-        } else
-            $ServerData['TestState'] = "VALIDATION_STATE_UNTESTED";
-        $ServerData['OS'] = $this->getOSInfo();
-
-
-        if( $ServerData['PHP']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['PHP']['valid'] == 'VALIDATION_STATE_WARNING' &&
-            $ServerData['MySQL']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['MySQL']['valid'] == 'VALIDATION_STATE_WARNING' &&
-            $ServerData['OS']['valid'] == 'VALIDATION_STATE_PASSED' || $ServerData['OS']['valid'] == 'VALIDATION_STATE_WARNING' )
-            $ServerData['AllowInstallation'] = "YES";
-        else
-            $ServerData['AllowInstallation'] = "NO";
-        return $ServerData;
     }
 
     /**
@@ -430,66 +521,6 @@ class Installer {
             $Valid = "VALIDATION_STATE_WARNING";
 
         return ['required' => $Required, 'installed' => $OSData, 'valid' => $Valid];
-    }
-
-    public function processInput($Databases, $SiteData){
-        $Configuration = '<?php'.PHP_EOL;
-        $Configuration .= 'global $FCCore;'.PHP_EOL.PHP_EOL;
-        $WebsiteConfiguration = "";
-        $PatchesConfiguration = [];
-        $SocialConfiguration = [];
-        $AnalyticsConfiguration = [];
-        $SiteConfiguration = [];
-        foreach($Databases as $Database)
-            if(count($Database) == 6)
-                $WebsiteConfiguration = $this->processWebsiteDatabase($Database);
-            else {
-                $Parsed = $this->processGameDatabase($Database, $PatchesConfiguration);
-                $PatchesConfiguration[$Parsed['Key']] = $Parsed['Config'];
-            }
-
-        $Configuration .= $WebsiteConfiguration;
-        foreach($PatchesConfiguration as $PatchDB)
-            $Configuration .= $PatchDB;
-
-        foreach($SiteData as $Key=>$Value){
-            if(strstr($Key, '_link') || strstr($Key, 'skype'))
-                $SocialConfiguration[] = $this->processSocialData($Key, $Value, $SocialConfiguration);
-            if(strstr($Key, 'ga_'))
-                $AnalyticsConfiguration[] = $this->processAnalyticsData($Key, $Value, $AnalyticsConfiguration);
-            if(strstr($Key, 'site_'))
-                $SiteConfiguration[] = $this->processSiteData($Key, $Value);
-        }
-
-        foreach($SocialConfiguration as $Social)
-            $Configuration .= $Social;
-        foreach($AnalyticsConfiguration as $Analytics)
-            $Configuration .= $Analytics;
-
-        $Configuration .= PHP_EOL.'// Facebook Settings'.PHP_EOL;
-        foreach($this->processFABlock() as $IKey => $IVal)
-            $Configuration .= '$FCCore[\'Facebook\'][\''.$IKey.'\'] = \''.$IVal.'\';'.PHP_EOL;
-
-        $Configuration .= PHP_EOL.'// Site Configuration'.PHP_EOL;
-        foreach($SiteConfiguration as $Item)
-            $Configuration .= $Item;
-        foreach($this->processBasicConfiguration() as $IKey => $IVal){
-            if($IVal === false)
-                $Configuration .= '$FCCore[\''.$IKey.'\'] = false;'.PHP_EOL;
-            elseif($IVal === true)
-                $Configuration .= '$FCCore[\''.$IKey.'\'] = true;'.PHP_EOL;
-            else
-                $Configuration .= '$FCCore[\''.$IKey.'\'] = \''.$IVal.'\';'.PHP_EOL;
-        }
-
-        $Configuration .= PHP_EOL."?>";
-        $ConfigurationFile = getcwd().DS.'Core'.DS.'Configuration'.DS.'Configuration.php';
-        if(File::Exists($ConfigurationFile)){
-            unlink($ConfigurationFile);
-            file_put_contents($ConfigurationFile, $Configuration);
-        } else {
-            file_put_contents($ConfigurationFile, $Configuration);
-        }
     }
 
     /**
@@ -636,5 +667,164 @@ class Installer {
             'pageid'    =>  '',
         ];
         return $Facebook;
+    }
+
+    /**
+     * Connect to Website Database
+     */
+    public function setWebsiteDatabase(){
+        $Databases = json_decode($this->getDatabases(), true);
+        foreach($Databases as $Key=>$Value) {
+            if (count($Value) == 6) {
+                try {
+                    $this->Connection = new PDO(
+                        "mysql:host=" . $Databases[$Key]['database_host'] . ";
+                        dbname=" . $Databases[$Key]['database_website'] . ";
+                        charset=" . $Databases[$Key]['database_encoding'],
+                        $Databases[$Key]['database_username'],
+                        $Databases[$Key]['database_password'],
+                        [PDO::ATTR_PERSISTENT => false]
+                    );
+                } catch (PDOException $e) {
+                    $ExceptionMessage = "<strong>Database Connection Exception Occurred</strong>" . PHP_NL;
+                    $ExceptionMessage .= "<strong>Error Code:</strong> " . $e->getCode() . PHP_NL;
+                    $ExceptionMessage .= "<strong>Error Message:</strong> " . $e->getMessage() . PHP_NL;
+                    $ExceptionMessage .= "<strong>Error File:</strong> " . $e->getFile() . PHP_NL;
+                    $ExceptionMessage .= "<strong>Error Line:</strong> " . $e->getLine() . PHP_NL;
+                    $ExceptionMessage .= "<i>Error occurred during initiation of the connection to </i><strong>" . $Databases[$Key]['database_website'] . "</strong><i> database</i>";
+                    die($ExceptionMessage);
+                };
+            }
+        }
+    }
+
+    public function buildInitialTables(){
+        //Database::plainSQLPDO($this->Connection, $this->buildUsersTable());
+        echo "<pre>";
+        //echo $this->buildUsersTable()->prettify();
+        //echo $this->buildApiAndroidArmoryTable()->prettify();
+        //echo $this->buildAPIKeysTable()->prettify();
+        //echo $this->buildClassAbilitiesTable()->prettify();
+        //echo $this->buildClassesTable()->prettify();
+        //echo $this->buildCommentsTable()->prettify();
+        echo $this->buildDBVersionTable()->prettify();
+    }
+
+    /**
+     * Create Users Table SQL
+     * @return mixed
+     */
+    private function buildUsersTable(){
+        return $this->DBManager->setTableName('users')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('username', 'varchar', 45, true, false, true)
+            ->addColumn('password', 'varchar', 50, true, false, true)
+            ->addColumn('email', 'varchar', 45, true, false, true)
+            ->addColumn('registration_date', 'datetime', false, true, false, true)
+            ->addColumn('pinned_character', 'int', 11, true, false, true)
+            ->addColumn('freedomtag_name', 'varchar', 45, true, false, true)
+            ->addColumn('freedomtag_id', 'int', 11, true, false, true)
+            ->addColumn('balance', 'float', true, false, 0)
+            ->addColumn('selected_currency', 'varchar', 6, true, false, 'USD')
+            ->addColumn('access_level', 'int', 2, false, false, 0)
+            ->build();
+    }
+
+    /**
+     * Create API Android Armory Table
+     * @return mixed
+     */
+    private function buildApiAndroidArmoryTable(){
+        return $this->DBManager->setTableName('api_android_armory')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('username', 'varchar', 45, true, false, true)
+            ->addColumn('password', 'varchar', 100, true, false, true)
+            ->addColumn('armory_key', 'varchar', 120, true, false, true)
+            ->addColumn('authorized', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create API Keys Table
+     * @return mixed
+     */
+    private function buildAPIKeysTable(){
+        return $this->DBManager->setTableName('api_keys')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('username', 'varchar', 45, true, false, true)
+            ->addColumn('api_key', 'varchar', 60, true, false, true)
+            ->addColumn('rps', 'int', 11, true, false, 5)
+            ->addColumn('rpm', 'int', 11, true, false, 300)
+            ->addColumn('rph', 'int', 11, true, false, 15000)
+            ->addColumn('active', 'int', 11, true, false, 1)
+            ->build();
+    }
+
+    /**
+     * Create Class Abilities Table
+     * @return mixed
+     */
+    private function buildClassAbilitiesTable(){
+        return $this->DBManager->setTableName('classabilities')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('class_name', 'varchar', 45, true, false, true)
+            ->addColumn('ability_name', 'varchar', 45, true, false, true)
+            ->addColumn('ability_description', 'varchar', 45, true, false, true)
+            ->addColumn('ability_icon', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Classes Table
+     * @return mixed
+     */
+    private function buildClassesTable(){
+        return $this->DBManager->setTableName('classes')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('class_id', 'int', 11, true, false, true)
+            ->addColumn('class_name', 'varchar', 45, true, false, true)
+            ->addColumn('class_description_classes', 'varchar', 45, true, false, true)
+            ->addColumn('can_be_tank', 'int', 11, true, false, true)
+            ->addColumn('can_be_heal', 'int', 11, true, false, true)
+            ->addColumn('can_be_dps', 'int', 11, true, false, true)
+            ->addColumn('melee_damage', 'int', 11, true, false, true)
+            ->addColumn('ranged_physical', 'int', 11, true, false, true)
+            ->addColumn('ranged_arcane', 'int', 11, true, false, true)
+            ->addColumn('class_description_personal_header', 'varchar', 45, true, false, true)
+            ->addColumn('class_description_personal_top', 'varchar', 45, true, false, true)
+            ->addColumn('class_description_personal', 'varchar', 45, true, false, true)
+            ->addColumn('indicator_first_type', 'varchar', 45, true, false, true)
+            ->addColumn('indicator_second_type', 'varchar', 45, true, false, true)
+            ->addColumn('first_specialization_image', 'varchar', 45, true, false, true)
+            ->addColumn('second_specialization_image', 'varchar', 45, true, false, true)
+            ->addColumn('third_specialization_image', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Comments Table
+     * @return mixed
+     */
+    private function buildCommentsTable(){
+        return $this->DBManager->setTableName('comments')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('article_id', 'int', 11, true, false, true)
+            ->addColumn('comment_by', 'varchar', 45, true, false, true)
+            ->addColumn('comment_text', 'text', false, true, false)
+            ->addColumn('comment_date', 'datetime', false, true, false, true)
+            ->addColumn('replied_to', 'int', 11, true, false, true)
+            ->addColumn('votes_up', 'int', 11, true, false, true)
+            ->addColumn('votes_down', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    private function buildDBVersionTable(){
+        return $this->DBManager->setTableName('db_version')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('database_version', 'varchar', 128, true, false, true)
+            ->addColumn('database_revision', 'int', 11, true, false, true)
+            ->addColumn('update_date', 'varchar', 45, true, false, true)
+            ->addColumn('install_date', 'varchar', 45, true, false, true)
+            ->build();
     }
 }

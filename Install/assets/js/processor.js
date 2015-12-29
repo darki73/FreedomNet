@@ -51,6 +51,7 @@ var Processor = {
 
                     Header = Processor.createElement('div', 'box-header with-border');
                     H3 = Processor.createElement('h3', 'box-title');
+                    console.log(element);
                     if(element.database_auth != undefined){
                         H3.innerHTML = '<i class="fa fa-database"></i> '+element.patch_name;
                         Header.appendChild(H3);
@@ -87,7 +88,7 @@ var Processor = {
 
         BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_host', 'Host', data.database_host));
         BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_port', 'Port', data.database_port));
-        BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_username', 'Username', data.database_user));
+        BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_username', 'Username', data.database_username));
         BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'password', 'db_password', 'Password', data.database_password));
         BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_auth', 'Auth DB', data.database_auth));
         BodyElement.appendChild(Processor.createFormGroup(data.patch_real, 'text', 'db_char', 'Char DB', data.database_characters));
@@ -101,7 +102,7 @@ var Processor = {
 
         BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_host', 'Host', data.database_host));
         BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_port', 'Port', data.database_port));
-        BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_username', 'Username', data.database_user));
+        BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_username', 'Username', data.database_username));
         BodyElement.appendChild(Processor.createFormGroup('website', 'password', 'database_password', 'Password', data.database_password));
         BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_website', 'Database', data.database_website));
         BodyElement.appendChild(Processor.createFormGroup('website', 'text', 'database_encoding', 'Encoding', data.database_encoding));

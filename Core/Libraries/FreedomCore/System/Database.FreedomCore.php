@@ -105,6 +105,21 @@ class Database {
     }
 
     /**
+     * Execute Plain Query With No Paramaters and PDO Object
+     * @param $PDO
+     * @param $Query
+     */
+    public static function plainSQLPDO(PDO $PDO, $Query){
+        try {
+            $Statement = $PDO->prepare($Query);
+            $Statement->execute();
+        } catch (PDOException $e){
+            $Message = Database::PDOExceptionMessage($e);
+            die($Message);
+        }
+    }
+
+    /**
      * Get Single Row From Database
      * @param $Connection           - Connection Name
      * @param $Query                - Query To Be Executed
