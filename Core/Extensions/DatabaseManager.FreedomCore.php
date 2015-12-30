@@ -39,6 +39,17 @@ class DatabaseManager {
     protected $FinalQuery = '';
 
     /**
+     * DatabaseManager constructor.
+     */
+    public function __construct(){
+        $this->TableName = null;
+        $this->Columns = [];
+        $this->isAIExists = false;
+        $this->AIColumn = null;
+        $this->FinalQuery = null;
+    }
+
+    /**
      * Set Table Name
      * @param $TableName
      * @return $this
@@ -208,7 +219,7 @@ class DatabaseManager {
     private function isAIAllowed(){
         try {
             if($this->isAIExists)
-                throw new Exception('Auto Increment Column is Already Set!<br />It\'s name is: '.$this->AIColumn);
+                throw new Exception('Auto Increment Column for table <i>'.$this->TableName.'</i> is Already Set!<br />It\'s name is: '.$this->AIColumn);
             else
                 return true;
         } catch (Exception $e) {

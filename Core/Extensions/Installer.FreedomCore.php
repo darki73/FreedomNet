@@ -1,9 +1,12 @@
 <?php
 namespace Core\Extensions;
+use Core\Libraries\FreedomCore\System\Manager as Manager;
 use Core\Libraries\FreedomCore\System\Database as Database;
 use Core\Libraries\FreedomCore\System\Text as Text;
 use Core\Libraries\FreedomCore\System\File as File;
 use \PDO as PDO;
+Manager::LoadExtension('DatabaseManager');
+use Core\Extensions\DatabaseManager as DBManager;
 
 class Installer {
 
@@ -311,8 +314,10 @@ class Installer {
      * Set Database Manager
      * @param DatabaseManager $DBManager
      */
-    public function assignDBManager(DatabaseManager $DBManager){
-        $this->DBManager = $DBManager;
+    public function assignDBManager(){
+        $this->DBManager = null;
+        $this->DBManager = new DBManager();
+        $this->setWebsiteDatabase();
     }
 
     /**
@@ -698,36 +703,26 @@ class Installer {
         }
     }
 
-    public function buildInitialTables(){
-        //Database::plainSQLPDO($this->Connection, $this->buildUsersTable());
-        echo "<pre>";
-        //echo $this->buildUsersTable()->prettify();
-        //echo $this->buildApiAndroidArmoryTable()->prettify();
-        //echo $this->buildAPIKeysTable()->prettify();
-        //echo $this->buildClassAbilitiesTable()->prettify();
-        //echo $this->buildClassesTable()->prettify();
-        //echo $this->buildCommentsTable()->prettify();
-        echo $this->buildDBVersionTable()->prettify();
-    }
-
     /**
-     * Create Users Table SQL
-     * @return mixed
+     * Build Initial Tables
+     * @return bool
      */
-    private function buildUsersTable(){
-        return $this->DBManager->setTableName('users')
-            ->addColumn('id', 'int', 11, false, true)
-            ->addColumn('username', 'varchar', 45, true, false, true)
-            ->addColumn('password', 'varchar', 50, true, false, true)
-            ->addColumn('email', 'varchar', 45, true, false, true)
-            ->addColumn('registration_date', 'datetime', false, true, false, true)
-            ->addColumn('pinned_character', 'int', 11, true, false, true)
-            ->addColumn('freedomtag_name', 'varchar', 45, true, false, true)
-            ->addColumn('freedomtag_id', 'int', 11, true, false, true)
-            ->addColumn('balance', 'float', true, false, 0)
-            ->addColumn('selected_currency', 'varchar', 6, true, false, 'USD')
-            ->addColumn('access_level', 'int', 2, false, false, 0)
-            ->build();
+    public function buildInitialTables(){
+        $ClassMethods = get_class_methods('Core\\Extensions\\Installer');
+        foreach($ClassMethods as $Key=>$Value)
+            if(!strstr($Value, 'build') || strstr($Value, 'Initial'))
+                unset($ClassMethods[$Key]);
+        $ClassMethods = array_values($ClassMethods);
+
+        try {
+            foreach($ClassMethods as $Method){
+                $this->assignDBManager();
+                Database::plainSQLPDO($this->Connection, $this->$Method()->stringify());
+            }
+        } catch (Exception $e){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -818,6 +813,10 @@ class Installer {
             ->build();
     }
 
+    /**
+     * Create Database Version Table
+     * @return mixed
+     */
     private function buildDBVersionTable(){
         return $this->DBManager->setTableName('db_version')
             ->addColumn('id', 'int', 11, false, true)
@@ -825,6 +824,369 @@ class Installer {
             ->addColumn('database_revision', 'int', 11, true, false, true)
             ->addColumn('update_date', 'varchar', 45, true, false, true)
             ->addColumn('install_date', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Factions Table
+     * @return mixed
+     */
+    private function buildFactionsTable(){
+        return $this->DBManager->setTableName('factions')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('side', 'int', 11, false, false, true)
+            ->addColumn('race_name', 'varchar', 45, true, false, true)
+            ->addColumn('race_description', 'varchar', 45, true, false, true)
+            ->addColumn('race_link', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Forum Comments Table
+     * @return mixed
+     */
+    private function buildForumCommentsTable(){
+        return $this->DBManager->setTableName('forum_comments')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('forum_id', 'int', 11, true, false, true)
+            ->addColumn('topic_id', 'int', 11, true, false, true)
+            ->addColumn('post_id', 'int', 11, true, false, true)
+            ->addColumn('posted_by', 'varchar', 45, true, false, true)
+            ->addColumn('post_time', 'int', 11, true, false, true)
+            ->addColumn('post_message', 'text', false, true, false)
+            ->build();
+    }
+
+    /**
+     * Create Forum Topics Table
+     * @return mixed
+     */
+    private function buildForumTopicsTable(){
+        return $this->DBManager->setTableName('forum_topics')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('forum_id', 'int', 11, true, false, true)
+            ->addColumn('posted_by', 'varchar', 45, true, false, true)
+            ->addColumn('topic', 'varchar', 200, true, false, true)
+            ->addColumn('views', 'int', 11, true, false, true)
+            ->addColumn('post_time', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Forums Table
+     * @return mixed
+     */
+    private function buildForumsTable(){
+        return $this->DBManager->setTableName('forums')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('forum_id', 'int', 11, true, false, true)
+            ->addColumn('forum_type', 'int', 11, true, false, true)
+            ->addColumn('forum_name', 'varchar', 90, true, false, true)
+            ->addColumn('forum_description', 'varchar', 90, true, false, true)
+            ->addColumn('forum_icon', 'varchar', 90, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Item Comments Table
+     * @return mixed
+     */
+    private function buildItemCommentsTable(){
+        return $this->DBManager->setTableName('item_comments')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('item_id', 'int', 11, true, false, true)
+            ->addColumn('discussion_key', 'varchar', 45, true, false, true)
+            ->addColumn('comment_by', 'varchar', 45, true, false, true)
+            ->addColumn('comment_text', 'text', false, true, false)
+            ->addColumn('comment_date', 'datetime', false, true, false)
+            ->addColumn('reply_to', 'int', 11, true, false, true)
+            ->addColumn('language_code', 'varchar', 5, true, false, true)
+            ->addColumn('votes_up', 'int', 11, true, false, true)
+            ->addColumn('votes_down', 'int', 11, true, false, true)
+            ->addColumn('replied_to', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create News Table
+     * @return mixed
+     */
+    private function buildNewsTable(){
+        return $this->DBManager->setTableName('news')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('title', 'varchar', 45, true, false, true)
+            ->addColumn('short_description', 'varchar', 150, true, false, true)
+            ->addColumn('full_description', 'text', false, true, false)
+            ->addColumn('posted_by', 'varchar', 45, true, false, true)
+            ->addColumn('post_date', 'datetime', false, true, false)
+            ->addColumn('post_miniature', 'varchar', 60, true, false, true)
+            ->addColumn('comments_key', 'varchar', 32, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Patch Notes Table
+     * @return mixed
+     */
+    private function buildPatchNotesTable(){
+        return $this->DBManager->setTableName('patch_notes')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('oatch_version', 'double', false, true, false, true)
+            ->addColumn('patch_name_ru', 'varchar', 45, true, false, true)
+            ->addColumn('patch_name_en', 'varchar', 45, true, false, true)
+            ->addColumn('patch_menu_icon', 'varchar', 45, true, false, true)
+            ->addColumn('patch_content_header', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Prices Table
+     * @return mixed
+     */
+    private function buildPricesTable(){
+        return $this->DBManager->setTableName('prices')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('type', 'int', 11, true, false, true)
+            ->addColumn('short_code', 'varchar', 45, true, false, true)
+            ->addColumn('price', 'float', false, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Professions Table
+     * @return mixed
+     */
+    private function buildProfessionsTable(){
+        return $this->DBManager->setTableName('professions')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('profession_id', 'int', 11, true, false, true)
+            ->addColumn('is_primary', 'int', 11, true, false, true)
+            ->addColumn('profession_name', 'varchar', 70, true, false, true)
+            ->addColumn('profession_translation', 'varchar', 70, true, false, true)
+            ->addColumn('profession_description', 'varchar', 70, true, false, true)
+            ->addColumn('profession_long_description', 'varchar', 70, true, false, true)
+            ->addColumn('profession_main_text', 'varchar', 70, true, false, true)
+            ->addColumn('comments_key', 'varchar', 70, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Race Class Relation Table
+     * @return mixed
+     */
+    private function buildRaceClassRelationTable(){
+        return $this->DBManager->setTableName('raceclassrelation')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('race', 'varchar', 45, true, false, true)
+            ->addColumn('class_warrior', 'int', 11, true, false, true)
+            ->addColumn('class_paladin', 'int', 11, true, false, true)
+            ->addColumn('class_hunter', 'int', 11, true, false, true)
+            ->addColumn('class_rogue', 'int', 11, true, false, true)
+            ->addColumn('class_priest', 'int', 11, true, false, true)
+            ->addColumn('class_death-knight', 'int', 11, true, false, true)
+            ->addColumn('class_shaman', 'int', 11, true, false, true)
+            ->addColumn('class_mage', 'int', 11, true, false, true)
+            ->addColumn('class_warlock', 'int', 11, true, false, true)
+            ->addColumn('class_druid', 'int', 11, true, false, true)
+            ->addColumn('class_monk', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Races Table
+     * @return mixed
+     */
+    private function buildRacesTable(){
+        return $this->DBManager->setTableName('races')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('race_id', 'int', 11, true, false, true)
+            ->addColumn('race', 'varchar', 45, true, false, true)
+            ->addColumn('can_join_alliance', 'int', 11, true, false, true)
+            ->addColumn('can_join_horde', 'int', 11, true, false, true)
+            ->addColumn('race_head_description', 'varchar', 45, true, false, true)
+            ->addColumn('race_top_description', 'varchar', 45, true, false, true)
+            ->addColumn('race_bottom_description', 'varchar', 45, true, false, true)
+            ->addColumn('start_location_title', 'varchar', 45, true, false, true)
+            ->addColumn('start_location_description', 'varchar', 45, true, false, true)
+            ->addColumn('capital_title', 'varchar', 45, true, false, true)
+            ->addColumn('capital_description', 'varchar', 45, true, false, true)
+            ->addColumn('mount_title', 'varchar', 45, true, false, true)
+            ->addColumn('mount_description', 'varchar', 45, true, false, true)
+            ->addColumn('leader_title', 'varchar', 45, true, false, true)
+            ->addColumn('leader_description', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_one_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_one_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_one_image', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_two_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_two_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_two_image', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_three_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_three_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_three_image', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_four_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_four_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_four_image', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_five_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_five_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_five_image', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_six_title', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_six_desc', 'varchar', 45, true, false, true)
+            ->addColumn('racial_ability_six_image', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Raids And Instances Table
+     * @return mixed
+     */
+    private function buildRaidsAndInstancesTable(){
+        return $this->DBManager->setTableName('raidsandinstances')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('map', 'int', 11, true, false, true)
+            ->addColumn('zone', 'int', 11, true, false, true)
+            ->addColumn('link_name', 'varchar', 60, true, false, true)
+            ->addColumn('name', 'varchar', 60, true, false, true)
+            ->addColumn('min_level', 'int', 11, true, false, true)
+            ->addColumn('max_level', 'int', 11, true, false, true)
+            ->addColumn('min_players', 'int', 11, true, false, true)
+            ->addColumn('max_players', 'int', 11, true, false, true)
+            ->addColumn('instance_type', 'int', 11, true, false, true)
+            ->addColumn('heroic_possible', 'int', 11, true, false, true)
+            ->addColumn('heroic_level_required', 'int', 11, true, false, true)
+            ->addColumn('in_group', 'int', 11, true, false, true)
+            ->addColumn('group_name', 'varchar', 60, true, false, true)
+            ->addColumn('group_size', 'int', 11, true, false, true)
+            ->addColumn('expansion_required', 'int', 11, true, false, true)
+            ->addColumn('tooltip_description', 'varchar', 60, true, false, true)
+            ->addColumn('zone_description', 'varchar', 60, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Sessions Table
+     * @return mixed
+     */
+    private function buildSessionsTable(){
+        return $this->DBManager->setTableName('sessions')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('set_time', 'varchar', 45, true, false, true)
+            ->addColumn('data', 'varchar', 600, true, false, true)
+            ->addColumn('session_key', 'varchar', 128, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Shop Codes Table
+     * @return mixed
+     */
+    private function buildShopCodesTable(){
+        return $this->DBManager->setTableName('shop_codes')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('purchased_item', 'varchar', 45, true, false, true)
+            ->addColumn('purchase_code', 'varchar', 100, true, false, true)
+            ->addColumn('purchase_date', 'varchar', 45, true, false, true)
+            ->addColumn('purchased_for_account', 'int', 11, true, false, true)
+            ->addColumn('code_activated', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Shop Items Table
+     * @return mixed
+     */
+    private function buildShopItemsTable(){
+        return $this->DBManager->setTableName('shop_items')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('short_code', 'varchar', 45, true, false, true)
+            ->addColumn('item_id', 'varchar', 45, true, false, true)
+            ->addColumn('item_name', 'varchar', 45, true, false, true)
+            ->addColumn('item_type', 'int', 11, true, false, true)
+            ->addColumn('item_shop_icon', 'varchar', 45, true, false, true)
+            ->addColumn('item_background', 'varchar', 45, true, false, true)
+            ->addColumn('item_background_color', 'varchar', 45, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Slideshow Table
+     * @return mixed
+     */
+    private function buildSlideshowTable(){
+        return $this->DBManager->setTableName('slideshow')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('title', 'varchar', 45, true, false, true)
+            ->addColumn('description', 'varchar', 200, true, false, true)
+            ->addColumn('url', 'varchar', 200, true, false, true)
+            ->addColumn('image', 'varchar', 200, true, false, true)
+            ->addColumn('duration', 'int', 11, true, false, true)
+            ->addColumn('enabled', 'int', 11, true, false, 1)
+            ->build();
+    }
+
+    /**
+     * Create Users Table SQL
+     * @return mixed
+     */
+    private function buildUsersTable(){
+        return $this->DBManager->setTableName('users')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('username', 'varchar', 45, true, false, true)
+            ->addColumn('password', 'varchar', 50, true, false, true)
+            ->addColumn('email', 'varchar', 45, true, false, true)
+            ->addColumn('registration_date', 'datetime', false, true, false, true)
+            ->addColumn('pinned_character', 'int', 11, true, false, true)
+            ->addColumn('freedomtag_name', 'varchar', 45, true, false, true)
+            ->addColumn('freedomtag_id', 'int', 11, true, false, true)
+            ->addColumn('balance', 'float', true, false, 0)
+            ->addColumn('selected_currency', 'varchar', 6, true, false, 'USD')
+            ->addColumn('access_level', 'int', 2, false, false, 0)
+            ->build();
+    }
+
+    /**
+     * Create users Activation Table
+     * @return mixed
+     */
+    private function buildUsersActivationTable(){
+        return $this->DBManager->setTableName('users_activation')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('username', 'varchar', 100, true, false, true)
+            ->addColumn('site_password', 'varchar', 100, true, false, true)
+            ->addColumn('game_password', 'varchar', 100, true, false, true)
+            ->addColumn('email', 'varchar', 100, true, false, true)
+            ->addColumn('registration_date', 'datetime', false, true, false)
+            ->addColumn('activation_code', 'varchar', 100, true, false, true)
+            ->addColumn('activated', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Users Payments History
+     * @return mixed
+     */
+    private function buildUsersPaymentsHistoryTable(){
+        return $this->DBManager->setTableName('users_payments_history')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('userid', 'int', 11, true, false, true)
+            ->addColumn('service', 'varchar', 45, true, false, true)
+            ->addColumn('price', 'float', false, true, false, true)
+            ->addColumn('date', 'datetime', false, true, false)
+            ->addColumn('digital_key', 'varchar', 120, true, false, true)
+            ->addColumn('status', 'int', 11, true, false, true)
+            ->build();
+    }
+
+    /**
+     * Create Installed Patches Table
+     * @return mixed
+     */
+    private function buildInstalledPatchesTable(){
+        return $this->DBManager->setTableName('installed_patches')
+            ->addColumn('id', 'int', 11, false, true)
+            ->addColumn('real_patch', 'int', 11, true, false, true)
+            ->addColumn('site_patch', 'int', 11, true, false, true)
+            ->addColumn('site_link', 'varchar', 45, true, false, true)
+            ->addColumn('patch_name', 'varchar', 60, true, false, true)
             ->build();
     }
 }
