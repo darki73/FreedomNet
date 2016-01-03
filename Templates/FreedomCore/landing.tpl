@@ -46,20 +46,15 @@
     <div class="wrapper">
         <div id="content">
             <div id="homepage">
-                <div class="game-column" id="home-game-wow">
-                    <a href="{$HTTPHost}/wotlk" class="game-promo" tabindex="0">
-                        <div class="game-tip">
-                            Wrath of the Lich King
-                        </div>
-                    </a>
-                </div>
-                <div class="game-column" id="home-game-wow">
-                    <a href="{$HTTPHost}/cata" class="game-promo" tabindex="2">
-                        <div class="game-tip">
-                            Cataclysm
-                        </div>
-                    </a>
-                </div>
+                {foreach $InstalledPatches as $Patch}
+                    <div class="game-column" id="home-game-wow">
+                        <a href="{$HTTPHost}/{$Patch.site_link}" class="game-promo promo-{$Patch.site_link}" tabindex="0">
+                            <div class="game-tip">
+                                {$Patch.patch_name}
+                            </div>
+                        </a>
+                    </div>
+                {/foreach}
                 <span class="clear"> <!-- --></span>
             </div>
         </div>

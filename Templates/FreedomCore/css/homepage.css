@@ -11,7 +11,12 @@
 #homepage .game-promo { border: 1px solid #3E414A; left: 6px; top: -95px; width: 163px; height: 392px; display: block; position: absolute; outline: none; text-align: left; padding: 0; font-size: 16px; color:#B2BAC7;}
 #homepage .game-promo:hover { color: #fff; }
 #homepage .game-promo .game-tip { line-height: 3.6; text-align: center; font-size: 14px; }
-#homepage #home-game-wow .game-promo { background: url("../images/homepage/wow.png") 0 0 no-repeat; }
+.promo-legion { background: url("../images/homepage/legion.png") 0 0 no-repeat; }
+.promo-wod { background: url("../images/homepage/wod.png") 0 0 no-repeat; }
+.promo-mop { background: url("../images/homepage/mop.png") 0 0 no-repeat; }
+.promo-cata { background: url("../images/homepage/cata.png") 0 0 no-repeat; }
+.promo-wotlk { background: url("../images/homepage/wotlk.png") 0 0 no-repeat; }
+.promo-tbc { background: url("../images/homepage/tbc.png") 0 0 no-repeat; }
 #homepage #home-game-wow .game-promo:hover,
 #homepage #home-game-wow .game-promo:focus { background-position: -248px 0; }
 

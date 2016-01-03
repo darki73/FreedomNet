@@ -23,7 +23,7 @@ Class Manager extends FreedomCore{
 	 * @param String $extension_name is a name of extension to be loaded
 	 * @return Returning status of operation
 	 */
-	public static function LoadExtension($ExtensionName, $AdditionalInfo = null)
+	public static function LoadExtension($ExtensionName, $AdditionalInfo = null, $Return = false)
 	{
 		if(file_exists(FREEDOMCORE_EXTENSIONS_DIR.$ExtensionName.'.FreedomCore.php'))
 		{
@@ -39,9 +39,15 @@ Class Manager extends FreedomCore{
 
 			if($AdditionalInfo != null)
 				if($isNamespaced)
-					new $NamespacedClass($AdditionalInfo);
+					if($Return == false)
+						new $NamespacedClass($AdditionalInfo);
+					else
+						return new $NamespacedClass($AdditionalInfo);
 				else
-					new $ExtensionName($AdditionalInfo);
+					if($Return == fasle)
+						new $ExtensionName($AdditionalInfo);
+					else
+						return new $ExtensionName($AdditionalInfo);
 		}
 		else
 		{

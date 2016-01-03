@@ -3,7 +3,10 @@ require_once('header.php');
 use Core\Libraries\FreedomCore\System\Manager as Manager;
 use Core\Libraries\FreedomCore\System\Database as Database;
 
-$Installer->buildInitialTables();
+//$Installer->buildInitialTables();
+echo "<pre>";
+
+print_r($Installer->populateInstalledPatchesTable());
 
 
 die();

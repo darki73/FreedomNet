@@ -60,6 +60,14 @@ class DatabaseManager {
     }
 
     /**
+     * Get Table Name
+     * @return null
+     */
+    public function getTableName(){
+        return $this->TableName;
+    }
+
+    /**
      * Add Column To The New Table
      * @param $ColumnName
      * @param $ColumnType

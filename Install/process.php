@@ -6,5 +6,4 @@ echo "<pre>";
 $Databases = $Installer->getDatabases();
 $Installer->processInput(json_decode($Databases, true), $_REQUEST);
 
-//Text::PrettyPrint(json_decode($Databases, true));
-//Text::PrettyPrint($_REQUEST);
+header('Location: /Install/database');

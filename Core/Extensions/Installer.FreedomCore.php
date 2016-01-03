@@ -57,8 +57,7 @@ class Installer {
      * @param $APIUrl
      * @return mixed
      */
-    private function getGithubResponse($APIUrl)
-    {
+    private function getGithubResponse($APIUrl){
         $Curl = curl_init();
         curl_setopt($Curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($Curl, CURLOPT_RETURNTRANSFER, true);
@@ -75,8 +74,7 @@ class Installer {
      * @param $FileName
      * @param array $Data
      */
-    private function writeToFile($Folder, $FileName, $Data = array())
-    {
+    private function writeToFile($Folder, $FileName, $Data = array()){
         $FileHandler = fopen($Folder.DS.$FileName, 'w');
         foreach($Data as $Key => $Value){
             fwrite($FileHandler, $Key . " = " .$Value ."\n");
@@ -312,7 +310,6 @@ class Installer {
 
     /**
      * Set Database Manager
-     * @param DatabaseManager $DBManager
      */
     public function assignDBManager(){
         $this->DBManager = null;
@@ -321,11 +318,32 @@ class Installer {
     }
 
     /**
+     * Populate 'installed_patches' database
+     */
+    public function populateInstalledPatchesTable(){
+        if(is_null($this->Connection))
+            $this->setWebsiteDatabase();
+        $Patches = json_decode($this->getDatabases(), true);
+        $InstalledPatches = [];
+        foreach($Patches as $Patch)
+            if(isset($Patch['patch_name']))
+                $InstalledPatches[] = [
+                    'real_patch'    =>  $Patch['patch_real'],
+                    'site_patch'    =>  $Patch['game_patch'],
+                    'site_link'     =>  $this->getPatchMatch($Patch['game_patch'])['short'],
+                    'patch_name'    =>  $Patch['patch_name'],
+                ];
+        $InstallQuery = "INSERT INTO installed_patches (`real_patch`, `site_patch`, `site_link`, `patch_name`) VALUES (:real_patch, :site_patch, :site_link, :patch_name);";
+        foreach($InstalledPatches as $Patch)
+            Database::parameterizedSQLPDO($this->Connection, $InstallQuery, $Patch);
+    }
+
+    /**
      * Match Patch ID With Its Name
      * @param $PatchID
      * @return mixed
      */
-    private function getPatchMatch($PatchID){
+    public function getPatchMatch($PatchID = null){
         $Patches = [
             1   =>  ['short' => 'classic', 'full' => 'Classic', 'real' => '0', 'dbname' => 'Classic'],
             2   =>  ['short' => 'tbc', 'full' => 'The Burning Crusade', 'real' => '1', 'dbname' => 'TBC'],
@@ -335,7 +353,10 @@ class Installer {
             6   =>  ['short' => 'draenor', 'full' => 'Warlords of Draenor', 'real' => '5', 'dbname' => 'WoD'],
             7   =>  ['short' => 'legion', 'full' => 'Legion', 'real' => '6', 'dbname' => 'Legion']
         ];
-        return $Patches[$PatchID];
+        if($PatchID == null)
+            return $Patches;
+        else
+            return $Patches[$PatchID];
     }
 
     /**
@@ -717,7 +738,9 @@ class Installer {
         try {
             foreach($ClassMethods as $Method){
                 $this->assignDBManager();
-                Database::plainSQLPDO($this->Connection, $this->$Method()->stringify());
+                $InstallationQuery = $this->$Method()->stringify();
+                Database::plainSQLPDO($this->Connection, 'DROP TABLE IF EXISTS '.$this->DBManager->getTableName().';');
+                Database::plainSQLPDO($this->Connection, $InstallationQuery);
             }
         } catch (Exception $e){
             return false;

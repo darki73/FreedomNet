@@ -92,12 +92,23 @@ class Database {
      * Execute Plain Query With No Parameters
      * @param $Connection           - Connection Name
      * @param $Query                - Query To Be Executed
+     * @param bool|false $Return
+     * @param bool|false $Multiple
+     * @return mixed
      */
-    public static function plainSQL($Connection, $Query){
+    public static function plainSQL($Connection, $Query, $Return = false, $Multiple = false){
         Database::selectConnection($Connection);
         try{
             $Statement = Database::$SelectedConnection->prepare($Query);
             $Statement->execute();
+            if($Return == true)
+                if(Database::isEmpty($Statement))
+                    return false;
+                else
+                    if($Multiple == false)
+                        return $Statement->fetch(PDO::FETCH_ASSOC);
+                    else
+                        return $Statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e){
             $Message = Database::PDOExceptionMessage($e);
             die($Message);
@@ -108,14 +119,76 @@ class Database {
      * Execute Plain Query With No Paramaters and PDO Object
      * @param $PDO
      * @param $Query
+     * @param bool|false $Return
+     * @param bool|false $Multiple
+     * @return array|bool|mixed
      */
-    public static function plainSQLPDO(PDO $PDO, $Query){
+    public static function plainSQLPDO(PDO $PDO, $Query, $Return = false, $Multiple = false){
         try {
             $Statement = $PDO->prepare($Query);
             $Statement->execute();
+            if($Return == true)
+                if(Database::isEmpty($Statement))
+                    return false;
+                else
+                    if($Multiple == false)
+                        return $Statement->fetch(PDO::FETCH_ASSOC);
+                    else
+                        return $Statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e){
             $Message = Database::PDOExceptionMessage($e);
             die($Message);
+        }
+    }
+
+    /**
+     * Execute Plain Parameterized Query
+     * @param PDO $PDO
+     * @param $Query
+     * @param $Parameters
+     * @param bool|false $Return
+     * @param bool|false $Multiple
+     * @return array|mixed
+     */
+    public static function parameterizedSQLPDO(PDO $PDO, $Query, $Parameters, $Return = false, $Multiple = false){
+        $CheckQuery = Database::plainSQLPDO($PDO, 'SELECT * FROM installed_patches WHERE patch_name = "'.$Parameters['patch_name'].'"', true);
+        if( $CheckQuery != false){
+            die('Already Exists');
+        } else {
+            try {
+                foreach($Parameters as $PKey=>$PValue)
+                    $Query = str_replace(':'.$PKey, "'".$PValue."'", $Query);
+                $Statement = $PDO->prepare($Query);
+                $Statement->execute();
+                if($Return == true)
+                    if($Multiple == false)
+                        return $Statement->fetch(PDO::FETCH_ASSOC);
+                    else
+                        return $Statement->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e){
+                $Message = Database::PDOExceptionMessage($e);
+                die($Message);
+            }
+        }
+    }
+
+    /**
+     * Get Value Type
+     * @param $Value
+     * @return int
+     */
+    public static function getPDOParamType($Value){
+        if(is_bool($Value)){
+            return PDO::PARAM_BOOL;
+        } elseif(ctype_digit($Value)){
+            if(ctype_punct($Value))
+                return PDO::PARAM_STR;
+            else
+                return PDO::PARAM_INT;
+        } elseif (ctype_alpha($Value)) {
+            return PDO::PARAM_STR;
+        } else {
+            return PDO::PARAM_STR;
         }
     }
 
