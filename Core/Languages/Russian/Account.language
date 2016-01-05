@@ -13,3 +13,17 @@ Account_Management_Cookies_Description = На нашем сайте исполь
 Account_Management_Cookies_Description_Mobile = На этом сайте используются cookie-файлы. Если вы сейчас остаетесь на сайте, это означает, что вы не возражаете против использования этих технологий.
 Account_Management_Cookies_Agree = Хорошо
 Account_Management_Cookies_More = Подробнее
+
+Account_Login = Авторизация
+Account_Login_Email = E-Mail
+Account_Login_Password = Пароль
+Account_Captcha_Renew = Обновить
+Account_Captcha_Code = Код
+Account_Login_Remember_Me = Запомнить Меня
+Account_Login_Authorization = Войти
+Account_Login_Create_Account = Создать Учетную Запись
+Account_Login_Cant_Login = Не можете войти?
+Account_Login_ =
+Account_Login_ =
+Account_Login_ =
+Account_Login_ =

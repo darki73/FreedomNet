@@ -1,0 +1,83 @@
+.nav-client .footer-content.footer-mobile {
+    display: block;
+}
+.nav-client .footer-mobile {
+    padding: 0;
+}
+#nav-client-header.mobileEnabled #nav-client-bar {
+    height: 44px;
+    position: fixed;
+    top: 0;
+}
+#nav-client-header.mobileEnabled .nav-header-content {
+    display: none;
+}
+.nav-client .mobileFooterEnabled {
+    display: none;
+}
+.nav-client .nav-mobile-menubar {
+    display: block;
+    width: 100%;
+    height: 44px;
+    text-align: center;
+}
+.nav-client .nav-mobile-menu-wrap.out {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+}
+.nav-client .out ~ #nav-blackout {
+    display: block !important;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon {
+    position: absolute;
+    right: 40px;
+    text-align: left;
+    top: 0;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon > a {
+    padding: 7px;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon > a:hover .nav-icon-bell,
+.nav-client .nav-mobile-menubar .nav-notification-icon > a:active .nav-icon-bell {
+    background-position: 0;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon.open > a .nav-icon-bell {
+    background-position: -30px 0;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon .nav-icon-bell {
+    top: auto;
+}
+.nav-client .nav-mobile-menubar .nav-notification-icon .arrow.top {
+    top: 6px;
+    right: 20px;
+}
+.nav-mobile-menubar .nav-notification-dropdown.dropdown-menu {
+    right: -44px;
+    left: -280px;
+    margin: 0;
+}
+.nav-mobile-menubar .nav-notification-dropdown.dropdown-menu .arrow.top {
+    right: 57px;
+    left: auto;
+    top: -9px;
+}
+@media (max-width: 380px) {
+    .nav-mobile-menubar .nav-notification-dropdown.dropdown-menu {
+        display: none;
+    }
+}
+.nav-notification-responsive-container .nav-notification-dropdown.dropdown-menu {
+    margin: 0;
+}
+.nav-notification-responsive-container .nav-notification-dropdown.dropdown-menu .arrow.top {
+    left: auto;
+}
+@media (max-width: 380px) {
+    .nav-notification-responsive-container {
+        display: block;
+    }
+    .nav-notification-responsive-container .nav-notification-dropdown.dropdown-menu {
+        width: 100%;
+        min-width: 0;
+    }
+}

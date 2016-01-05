@@ -110,7 +110,7 @@
                                     <a class="nav-item nav-a" href="/about/infringementnotice" data-analytics="global-nav" data-analytics-placement="Footer - Copyright Infringement">{#Footer_Copyright#}</a>
                                     <span>|</span>
                                     <a class="nav-item nav-a" href="/api" data-analytics="global-nav" data-analytics-placement="Footer - API">API</a>
-                                    <div class="copyright">© {$AppName}, 2015 г.</div>
+                                    <div class="copyright">© {$AppName}, {'Y'|date}</div>
                                     <div class="nav-footer-icon-container">
                                         <ul class="nav-footer-icon-list">
                                         </ul>

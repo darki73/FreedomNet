@@ -47,6 +47,7 @@
         Flash.videoBase = '{$HTTPHost}/root/media/videos';
         Flash.ratingImage = '{$HTTPHost}/Templates/{$Template}/global-video-player/ratings/root/ru-ru.jpg';
         Flash.expressInstall = '{$HTTPHost}/Templates/{$Template}/global-video-player/expressInstall.swf';
+        //]]>
     </script>
     {if $GoogleAnalytics.Account != ''}
         <script>

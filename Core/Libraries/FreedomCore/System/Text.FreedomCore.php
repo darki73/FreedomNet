@@ -4,6 +4,7 @@ namespace Core\Libraries\FreedomCore\System;
 
 use \DateTime as DateTime;
 use \SplStack as SplStack;
+use Core\Libraries\FreedomCore\System\Session as Session;
 
 Class Text
 {
@@ -296,14 +297,15 @@ Class Text
 
     public static function GenerateCaptcha()
     {
+        $Session = new Session();
         flush();
         ob_clean();
         if(isset($_SESSION['generated_captcha']) && $_SESSION['generated_captcha'] != '')
-            Session::UnsetKeys(array('generated_captcha'));
+            $Session->unsetKeys(['generated_captcha']);
         $InitialString = str_shuffle("abcdefghijklmnopqrstuvwxyz1234567890");
         $RandomString = substr($InitialString,0,9);
         $_SESSION['generated_captcha'] = $RandomString;
-        Session::UpdateSession($_SESSION);
+        $Session->updateSession($_SESSION);
         $CreateBlankImage = ImageCreate (200, 70) or die ("Cannot Initialize new GD image stream");
         $BackgroundColor = ImageColorAllocateAlpha($CreateBlankImage, 255, 255, 255, 127);
         imagefill($CreateBlankImage,0,0,0x7fff0000);

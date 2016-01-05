@@ -36,7 +36,7 @@
                                             <div class="user-profile">
                                                 <div class="dropdown-section">
                                                     <div class="nav-box">
-                                                        <a class="nav-item nav-btn nav-btn-block nav-login-btn" href="?login" data-analytics="global-nav" data-analytics-placement="Nav - Account - Log In">
+                                                        <a class="nav-item nav-btn nav-btn-block nav-login-btn" href="/account/login" data-analytics="global-nav" data-analytics-placement="Nav - Account - Log In">
                                                             {#Account_Management_Login#}
                                                         </a>
                                                     </div>

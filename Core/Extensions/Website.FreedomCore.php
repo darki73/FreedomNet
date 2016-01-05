@@ -25,8 +25,29 @@ class Website {
         $this->TM = $TemplatesManager;
     }
 
+    /**
+     * Get Installed Patches To Be Displayed On Main Page
+     * @return array|bool|mixed
+     */
     public function getInstalledPatches(){
         return Database::plainSQLPDO($this->Connection, 'SELECT * FROM installed_patches', true, true);
+    }
+
+    public function selectGameDatabase(){
+
+    }
+
+    /**
+     * Get Theme for Authorization and Registration Page
+     * @param $Request
+     * @return string
+     */
+    public function getWebsiteTheme($Request){
+        $AllowedThemes = ['classic', 'tbc', 'wotlk', 'cata', 'mop', 'wod', 'legion', 'bnet'];
+        if(isset($Request['theme']))
+            if(in_array($Request['theme'], $AllowedThemes))
+                return 'wow-'.$Request['theme'];
+        return 'bnet';
     }
 
 }

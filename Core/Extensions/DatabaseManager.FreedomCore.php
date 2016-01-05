@@ -1,6 +1,7 @@
 <?php
 namespace Core\Extensions;
 
+use Core\Libraries\FreedomCore\System\Database;
 use Core\Libraries\FreedomCore\System\Text;
 use \Exception as Exception;
 
@@ -19,6 +20,18 @@ class DatabaseManager {
      * @var array
      */
     protected $Columns = [];
+
+    /**
+     * Conditions Array
+     * @var array
+     */
+    protected $Where = [];
+
+    /**
+     * Relation Between Prepared Statement Value and Real Value
+     * @var array
+     */
+    protected $Relations = [];
 
     /**
      * Value will be set to true, if Auto Increment already exists
@@ -119,7 +132,6 @@ class DatabaseManager {
 
     /**
      * Remove New Lines From Query
-     * @param $Query
      * @return mixed
      */
     public function stringify(){
@@ -132,6 +144,123 @@ class DatabaseManager {
      */
     public function prettify(){
         return $this->FinalQuery;
+    }
+
+    /**
+     * Execute Query
+     * @param $Connection
+     * @param bool|false $Return
+     * @param bool|false $Multiple
+     * @return mixed
+     */
+    public function executePDO($Connection, $Return = false, $Multiple = false){
+        $Statement = $Connection->prepare($this->FinalQuery);
+        foreach($this->Where as $Condition=>$Item)
+            $Statement->bindParam($Condition, $this->Relations[$Condition]);
+        $Statement->execute();
+        if($Return)
+            if($Multiple)
+                if(Database::isEmpty($Statement))
+                    return false;
+                else
+                    return $Statement->fetchAll(\PDO::FETCH_ASSOC);
+            else
+                if(Database::isEmpty($Statement))
+                    return false;
+                else
+                    return $Statement->fetch(\PDO::FETCH_ASSOC);
+        else
+            return true;
+    }
+
+    /**
+     * Add Column For Further Selection
+     * @param $ColumnName
+     * @return $this
+     */
+    public function selectColumn($ColumnName){
+        $this->Columns[] = $ColumnName;
+        return $this;
+    }
+
+    /**
+     * Define Multiple Columns For Selection
+     * @param $Columns
+     * @return $this
+     * @throws Exception
+     */
+    public function selectColumns($Columns){
+        try {
+            if(!is_array($Columns)){
+                if(strstr($Columns, ','))
+                    $Columns = explode(',', str_replace(' ', '', $Columns));
+                else
+                    throw new Exception('Given Variable is not an array, nor the colon separated string');
+            }
+
+            foreach($Columns as $Column)
+                if(!in_array($Column, $this->Columns))
+                    $this->Columns[] = $Column;
+            return $this;
+        } catch (Exception $e){
+            $Message = '<h1>Database Manger Exception</h1><strong>Fatal Error: </strong>'.$e->getMessage();
+            die($Message);
+        }
+    }
+
+    /**
+     * Add Conditions For Query
+     * @param $Where
+     * @param $Operator
+     * @param $Value
+     * @return $this
+     */
+    public function addCondition($Where, $Operator, $Value){
+        if(!array_key_exists($Where, $this->Where))
+            $this->Where[$Where] = ['operator' => $Operator, 'value' => $Value];
+        return $this;
+    }
+
+    /**
+     * Add Relation Between Where Key And PDO Prepared Value
+     * @param $Where
+     * @param $Value
+     * @return $this
+     */
+    public function addRelation($Where, $Value){
+        if(!array_key_exists($Where, $this->Relations))
+            $this->Relations[$Where] = $Value;
+        return $this;
+    }
+
+    /**
+     * Create Select Statement
+     * @return $this
+     */
+    public function select(){
+        $Statement = 'SELECT ';
+        for($i = 0; $i < count($this->Columns); $i++){
+            if($i == (count($this->Columns) - 1))
+                $Statement .= $this->Columns[$i].' ';
+            else
+                $Statement .= $this->Columns[$i].', ';
+        }
+        $Statement .= 'FROM '.$this->TableName.' ';
+        if(!empty($this->Where)){
+            $Statement .= 'WHERE ';
+            $Count = count($this->Where);
+            $Index = 1;
+            foreach($this->Where as $Condition=>$Item){
+                if($Index != $Count)
+                    $Statement .= $Condition.' '.$Item['operator'].' '.$Item['value'].' AND ';
+                else
+                    $Statement .= $Condition.' '.$Item['operator'].' '.$Item['value'];
+
+                $Index++;
+            }
+        }
+        $this->FinalQuery = $Statement.';';
+        return $this;
     }
 
     /**

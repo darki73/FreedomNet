@@ -1,0 +1,929 @@
+body.armory em,body.wow em {
+    color: #1baae9;
+}
+
+#help-links,#sending,.text-center {
+    text-align: center;
+}
+
+body,html {
+    background-color: transparent;
+    height: 100%;
+}
+
+body {
+    min-width: 320px;
+}
+
+body #info-wrapper {
+    width: 40%;
+    min-width: 200px;
+    max-width: 500px;
+    vertical-align: top;
+    padding: 0 7px;
+    float: left;
+}
+
+body #login-wrapper {
+    max-width: 500px;
+    margin: 0 auto 115px;
+}
+
+body #login-wrapper.info-active {
+    width: 50%;
+    min-width: 230px;
+    max-width: 500px;
+    padding: 0 7px;
+    float: right;
+}
+
+body #login-wrapper.info-active #password-form,body #password-form,body.challenge-template .legal-wrapper #password-form {
+    width: 100%;
+}
+
+body #login-wrapper #password-form button#submit {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+body.wtcg #login-wrapper {
+    margin: 0 auto;
+}
+
+body #password-form {
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body .legal-wrapper,body .legal-wrapper#login-wrapper {
+    max-width: 720px;
+}
+
+body .legal-wrapper ol,body .legal-wrapper#login-wrapper ol {
+    margin-left: 20px;
+}
+
+body.challenge-template #password-form {
+    min-width: 290px;
+    max-width: 500px;
+    width: 100%;
+}
+
+body.challenge-template #password-form button#submit {
+    margin-top: 0 !important;
+}
+
+body.bnet {
+    background-image: url(../../images/login/background/login-background-1920.jpg);
+    background-color: #0d1e30;
+}
+
+body.armory {
+    background-image: url(../../images/login/background/armory-background-768.jpg);
+    background-color: #1e0606;
+}
+
+body.armory .logo {
+    background-image: url(../../images/login/logo/armory/armory.png);
+}
+
+body.armory :lang(de) .logo {
+    background-image: url(../../images/login/logo/armory/armory-de.png);
+}
+
+body.armory :lang(es) .logo {
+    background-image: url(../../images/login/logo/armory/armory-es.png);
+}
+
+body.armory :lang(fr) .logo {
+    background-image: url(../../images/login/logo/armory/armory-fr.png);
+}
+
+body.armory :lang(it) .logo {
+    background-image: url(../../images/login/logo/armory/armory-it.png);
+}
+
+body.armory :lang(ko) .logo {
+    background-image: url(../../images/login/logo/armory/armory-ko.png);
+}
+
+body.armory :lang(pt) .logo {
+    background-image: url(../../images/login/logo/armory/armory-pt.png);
+}
+
+body.armory :lang(ru) .logo {
+    background-image: url(../../images/login/logo/armory/armory-ru.png);
+}
+
+body.armory :lang(zh-CN) .logo {
+    background-image: url(../../images/login/logo/armory/armory-zh-cn.png);
+}
+
+body.armory :lang(zh-TW) .logo {
+    background-image: url(../../images/login/logo/armory/armory-zh-tw.png);
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio:1.5),only screen and (-o-min-device-pixel-ratio:3/2),only screen and (min--moz-device-pixel-ratio:1.5),only screen and (min-device-pixel-ratio:1.5) {
+    body.armory .logo {
+        background-image: url(../../images/login/logo/armory/armory-2x.png);
+    }
+
+    body.armory :lang(de) .logo {
+        background-image: url(../../images/login/logo/armory/armory-de-2x.png);
+    }
+
+    body.armory :lang(es) .logo {
+        background-image: url(../../images/login/logo/armory/armory-es-2x.png);
+    }
+
+    body.armory :lang(fr) .logo {
+        background-image: url(../../images/login/logo/armory/armory-fr-2x.png);
+    }
+
+    body.armory :lang(it) .logo {
+        background-image: url(../../images/login/logo/armory/armory-it-2x.png);
+    }
+
+    body.armory :lang(ko) .logo {
+        background-image: url(../../images/login/logo/armory/armory-ko-2x.png);
+    }
+
+    body.armory :lang(pt) .logo {
+        background-image: url(../../images/login/logo/armory/armory-pt-2x.png);
+    }
+
+    body.armory :lang(ru) .logo {
+        background-image: url(../../images/login/logo/armory/armory-ru-2x.png);
+    }
+
+    body.armory :lang(zh-CN) .logo {
+        background-image: url(../../images/login/logo/armory/armory-zh-cn-2x.png);
+        background-size: 239px 146px;
+    }
+
+    body.armory :lang(zh-TW) .logo {
+        background-image: url(../../images/login/logo/armory/armory-zh-tw-2x.png);
+    }
+}
+
+body.armory .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-legion {
+    background-image: url(../../images/login/background/Legio/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-wod {
+    background-image: url(../../images/login/background/WoD/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-mop {
+    background-image: url(../../images/login/background/MoP/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-cata {
+    background-image: url(../../images/login/background/Cata/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-wotlk {
+    background-image: url(../../images/login/background/WotLK/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-tbc {
+    background-image: url(../../images/login/background/TBC/background-1920.jpg);
+    background-color: #230f04;
+}
+
+body.wow-classic {
+    background-image: url(../../images/login/background/Classic/background-1920.jpg);
+    background-color: #230f04;
+}
+
+
+
+body.wow-legion .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-wod .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-mop .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-cata .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-wotlk .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-tbc .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+body.wow-classic .icon-48-refresh {
+    background-image: url(../../images/toolkit/themes/bnet/icons/sprite-48-orange.png);
+}
+
+@media (max-width:1280px) {
+    body.bnet {
+        background-image: url(../../images/login/background/login-background-1280.jpg);
+    }
+
+    body.wow-legion {
+        background-image: url(../../images/login/background/Legion/background-1280.jpg);
+    }
+
+    body.wow-wod {
+        background-image: url(../../images/login/background/WoD/background-1280.jpg);
+    }
+
+    body.wow-mop {
+        background-image: url(../../images/login/background/MoP/background-1280.jpg);
+    }
+
+    body.wow-cata {
+        background-image: url(../../images/login/background/Cata/background-1280.jpg);
+    }
+
+    body.wow-wotlk {
+        background-image: url(../../images/login/background/WotLK/background-1280.jpg);
+    }
+
+    body.wow-tbc {
+        background-image: url(../../images/login/background/TBC/background-1280.jpg);
+    }
+
+    body.wow-classic {
+        background-image: url(../../images/login/background/Classic/background-1280.jpg);
+    }
+}
+
+@media (max-width:640px) {
+    .legal-template h1.logo,.legal-wrapper #eula-title {
+        display: none;
+    }
+
+    body.bnet {
+        background-image: url(../../images/login/background/login-background-640-2x.jpg);
+        background-size: 640px auto;
+    }
+
+    .legal-wrapper p {
+        font-size: 12px;
+        line-height: 14px;
+        margin-bottom: 5px;
+    }
+
+    .legal-wrapper ol {
+        margin: 5px 0 0 20px;
+    }
+
+    .legal-wrapper ol li {
+        margin-bottom: 10px;
+        line-height: 15px;
+    }
+
+    .legal-wrapper ol:first-child {
+        margin-left: 10px;
+    }
+
+    .legal-wrapper #legal-container {
+        min-height: 120px;
+    }
+
+    .legal-wrapper .legal-document h1 {
+        font-size: 16px;
+        line-height: 18px;
+        margin-bottom: 10px;
+    }
+
+    .legal-wrapper .legal-document h3 {
+        font-size: 14px;
+        margin-bottom: 10px;
+        line-height: 16px;
+    }
+
+    .legal-wrapper .legal-document h4 {
+        margin-bottom: 10px;
+    }
+
+    .legal-wrapper #legal-form {
+        padding-bottom: 0;
+    }
+
+    .legal-wrapper #legal-form .form-footer {
+        margin-top: 10px;
+    }
+
+    .control-group.separated {
+        margin-top: 1.5em;
+    }
+
+    .lower-footer #copyright span {
+        display: block;
+    }
+}
+
+@media (max-width:480px) {
+    body.armory {
+        background-image: url(../../images/login/background/armory-background-480.jpg);
+    }
+
+    body.armory .logo {
+        margin-bottom: 0;
+    }
+
+    body {
+        min-width: 320px;
+    }
+
+    body .logo {
+        margin-top: 5px;
+    }
+
+    body h1 {
+        font-size: 25px;
+        margin-bottom: 15px;
+        line-height: 28px;
+    }
+
+    body h3 {
+        font-size: 14px;
+    }
+
+    body h4 {
+        font-size: 13px;
+    }
+
+    body h5 {
+        margin-bottom: 5px;
+    }
+
+    body #info-wrapper,body #login-wrapper,body #password-form {
+        min-width: 290px !important;
+    }
+
+    body #login-wrapper {
+        margin: 0 auto 15px;
+    }
+
+    body #login-wrapper.info-active {
+        float: none;
+    }
+
+    body .legal-wrapper ol li {
+        margin-bottom: 5px;
+        line-height: 15px;
+    }
+
+    body .legal-wrapper ol ol,body .legal-wrapper ol ol:first-child {
+        margin-left: 0;
+    }
+
+    body .legal-wrapper .btn-response {
+        display: block;
+        float: left;
+        width: 48.5%;
+    }
+
+    body .legal-wrapper a.btn-response {
+        float: right;
+    }
+
+    body #info-wrapper {
+        float: none;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    body .btn-response {
+        display: block;
+        width: 100%;
+        float: none;
+        margin: 0;
+    }
+
+    body .captcha .captcha-image {
+        height: 45px;
+        padding: 0;
+    }
+
+    body .captcha .captcha-image img {
+        height: 45px;
+    }
+
+    body .captcha .icon-48-refresh {
+        right: 5px;
+        top: 9px;
+        width: 24px;
+        height: 24px;
+        background-size: 240px 721px;
+        background-position: -144px -96px;
+    }
+
+    body .visible-phone {
+        display: inherit !important;
+    }
+
+    body .control-group.separated {
+        margin-top: 1em;
+    }
+
+    body #persistAuthenticator-label {
+        margin: 10px 0 20px !important;
+    }
+
+    body.phone-lock-template .separated {
+        margin-bottom: 0;
+    }
+
+    body.phone-lock-template .number-container {
+        padding: 17px;
+    }
+
+    body.phone-lock-template em {
+        display: block;
+        margin-top: 10px;
+    }
+
+    p {
+        line-height: 20px;
+    }
+}
+
+@media (max-height:500px) {
+    .legal-template h1.logo {
+        display: none;
+    }
+}
+
+.grid-container {
+    padding: 10px;
+}
+
+.grid-container.wrapper {
+    position: relative;
+    min-height: 100%;
+}
+
+.mobile {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.logo {
+    margin-top: 35px;
+    margin-bottom: 10px;
+}
+
+.icon-center {
+    display: block;
+    margin: 0 auto;
+}
+
+.alert,a.btn,button.btn,input,label.checkbox {
+    margin-bottom: 15px;
+}
+
+#help-links,#resend-challenge.loading:before,a.btn i[class^=icon-],button.btn i[class^=icon-],input i[class^=icon-],label.checkbox i[class^=icon-] {
+    margin-left: 0;
+}
+
+#resend-challenge .icon,a.btn-response {
+    margin-right: 0;
+}
+
+.alert.alert-icon {
+    padding: 10px 20px 10px 49px;
+}
+
+.alert.alert-icon:before {
+    top: 8px;
+    left: 14px;
+}
+
+label.control-label {
+    display: none;
+}
+
+#help-links {
+    list-style-type: none;
+    margin-bottom: 10px;
+}
+
+#help-links li {
+    padding-left: 0;
+    margin-bottom: 15px;
+}
+
+.btn-large,.btn-response {
+    padding: 9px 10px;
+}
+
+.btn-response {
+    display: block;
+    float: left;
+    width: 48.5%;
+}
+
+#challenge-input,#footer .nav-footer-icon-container,#footer .nav-ratings,#footer .support-feedback,#sending {
+    display: none;
+}
+
+a.btn-response {
+    float: right;
+}
+
+#resend-challenge {
+    margin: 0;
+    padding: 6px 0;
+    min-width: 100px;
+}
+
+#sending {
+    margin-top: 20px;
+}
+
+#sending i {
+    vertical-align: middle;
+}
+
+#resend-alert {
+    display: none;
+    margin-top: 10px;
+}
+
+#resend-challenge,#resend-challenge:active,#resend-challenge:focus,#resend-challenge:hover {
+    background: 0 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.phone-lock-template .separated {
+    margin-bottom: 1em;
+}
+
+.number-container {
+    border-top: 1px solid rgba(255,255,255,.15);
+    background-color: rgba(0,0,0,.3);
+    padding: 20px;
+}
+
+.number-container h3 {
+    margin: 0 !important;
+}
+
+.number-container.bottom {
+    border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+em {
+    font-style: normal;
+    color: #75e900;
+}
+
+h1 {
+    font-size: 35px;
+    margin-bottom: 30px;
+}
+
+.control-group,h2 {
+    margin-bottom: 5px;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+h5 {
+    font-size: 15px;
+}
+
+#footer.pl-pl .nav-item,#footer.ru-ru .nav-item {
+    font-size: 12px;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+.control-group.separated {
+    margin-top: 2em;
+}
+
+.error-template .error-heading {
+    margin-top: 40px;
+}
+
+.js-enabled .select-box {
+    margin-top: 0;
+}
+
+#challenge-list {
+    position: relative;
+}
+
+#challenge-list select.css-input+.icon-chevron-down {
+    position: absolute;
+    right: 8px;
+    top: 10px;
+}
+
+#footer {
+    margin-top: 175px;
+}
+
+#footer .footer-desktop {
+    position: absolute;
+    bottom: 35px;
+    min-width: 680px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
+#footer .footer-mobile {
+    position: absolute;
+    bottom: 20px;
+    min-width: 95%;
+    width: 95%;
+}
+
+#footer .footer-mobile .footer-logo {
+    padding-top: 20px;
+}
+
+#footer .nav-section {
+    margin: 0;
+}
+
+#footer .nav-logo-group {
+    margin-bottom: 0;
+}
+
+#footer.de-de .footer-desktop,#footer.es-es .footer-desktop,#footer.it-it .footer-desktop {
+    min-width: 950px;
+}
+
+#footer.es-mx .footer-desktop {
+    min-width: 750px;
+}
+
+#footer.fr-fr .footer-desktop {
+    min-width: 1000px;
+}
+
+#footer.ko-kr .footer-desktop {
+    min-width: 800px;
+}
+
+#footer.ko-kr .company-info-container {
+    width: auto;
+}
+
+#footer.pl-pl .footer-desktop {
+    min-width: 1140px;
+}
+
+#footer.ru-ru .footer-desktop {
+    min-width: 1170px;
+}
+
+#footer.zh-cn .footer-desktop {
+    min-width: 700px;
+}
+
+#footer.zh-cn .nav-footer-icon-container {
+    display: block;
+}
+
+#footer.ja-jp .footer-desktop {
+    min-width: 720px;
+}
+
+body.zh-cn #login-wrapper {
+    margin-bottom: 170px;
+}
+
+.captcha {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+.captcha #captcha-anchor {
+    cursor: pointer;
+    display: block;
+}
+
+.captcha .icon-48-refresh {
+    position: absolute;
+    right: 10px;
+    top: 19px;
+    background-size: 480px 1440px;
+}
+
+.captcha .captcha-image {
+    background-color: #FFF;
+    border-radius: 3px;
+    padding: 10px 0;
+    margin: 10px auto 0;
+    height: 70px;
+}
+
+.captcha .captcha-image img {
+    display: block;
+    margin: 0 auto;
+}
+
+a.btn .spinner-battlenet,button .spinner-battlenet {
+    display: none;
+}
+
+a.btn.disabled-loading .spinner-battlenet,button.disabled-loading .spinner-battlenet {
+    display: inline-block;
+}
+
+.input-alike,.input-checkbox.checked:active {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mobile .input-alike {
+    -webkit-transform: translate3d(0,0,0);
+}
+
+.input-alike {
+    border: 1px solid rgba(9,140,200,.7);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.025);
+}
+
+.wtcg .input-alike {
+    border-color: rgba(107,56,0,.7);
+}
+
+.main-container {
+    -webkit-overflow-scrolling: touch;
+    word-wrap: break-word;
+}
+
+.legal-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.legal-wrapper .main-container {
+    background-color: rgba(0,0,0,.15);
+    border: 1px solid rgba(255,255,255,.15);
+    box-shadow: 0 0 transparent;
+    border-radius: 2px;
+}
+
+.legal-wrapper #challenge-input {
+    display: block;
+    margin-top: 0;
+}
+
+.legal-wrapper #challenge-input #password-form {
+    max-width: 100%;
+}
+
+.legal-wrapper #challenge-input #password-form #submit {
+    margin-top: 0;
+}
+
+#legal-form {
+    padding-bottom: 25px;
+}
+
+.legal-document {
+    font-size: 13px;
+    padding: 0 5px;
+    margin-bottom: 10px;
+}
+
+.legal-document h1 {
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 30px;
+}
+
+.legal-document h2 {
+    padding-top: 0;
+    font-size: 24px;
+    line-height: 24px;
+}
+
+.legal-document h3 {
+    padding-top: 0;
+    line-height: 20px;
+}
+
+.legal-document h5 {
+    padding-top: 0;
+}
+
+.legal-document ol {
+    list-style: none;
+}
+
+.legal-document li {
+    padding-left: 0;
+}
+
+.legal-document-kr {
+    overflow-y: scroll;
+}
+
+.legal-document>ol {
+    list-style-type: decimal;
+}
+
+.legal-document>ol>li>ol {
+    list-style-type: upper-alpha;
+    margin-top: 10px;
+}
+
+.legal-document>ol>li>ol>li>ol {
+    list-style-type: lower-roman;
+}
+
+.legal-document>ol>li>ol>li>ol>li>ol {
+    list-style-type: decimal;
+}
+
+.legal-document>ol>li>ol>li>ol>li>ol>li>ol {
+    list-style-type: lower-alpha;
+}
+
+.legal-document>ol>li>ol>li>ol>li>ol>li>ol>li ol {
+    list-style-type: decimal;
+}
+
+.legal-summary-bar {
+    border-width: 1px 1px 0;
+    padding: 20px 20px 10px 10px;
+}
+
+.legal-summary-bar-bottom {
+    border-width: 1px;
+    padding: 20px 20px 10px 10px;
+}
+
+.form-content ol {
+    text-align: left;
+    margin: 0;
+    line-height: 16px;
+    word-spacing: 1px;
+}
+
+.form-content ol li {
+    letter-spacing: normal;
+    margin: 15px 0 0 1px;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.form-content ol li span {
+    margin-left: -4px;
+}
+
+.agreements a.clean {
+    font-size: 12px;
+}
+
+.agreements a.clean i {
+    margin-left: 6px;
+}
+
+.form-footer {
+    margin-top: 20px;
+}
+
+.authenticator-template .authenticator-image {
+    text-align: center;
+}
+
+.authenticator-template #persistAuthenticator-label {
+    margin: 20px 0 40px;
+}
+
+.authenticator-template #help-links {
+    margin-top: 15px;
+    text-align: left;
+}
